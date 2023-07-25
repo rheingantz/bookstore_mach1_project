@@ -1,10 +1,47 @@
 import { executeQuery } from "./queryExecution";
-import { IBookPost } from "../interfaces/bookInterface";
+import Joi from "Joi";
 
-async function postBook(body:IBookPost){
-    console.log(body.nome);
-    const query = 'INSERT INTO livros(nome, codigo_barras, id_editora, preco, estoque, id_idioma) VALUES ($1, $2, $3, $4, $5, $6)';
-    const newBookDB = await executeQuery(query, [body.nome, body.codigo_barras, body.id_editora, body.preco, body.estoque, body.id_idioma]);
-    return newBookDB;}
 
-export {postBook};
+async function insertBook(
+    name: string,
+    barcode: string,
+    publisherId: number,
+    price: number,
+    stock: number,
+    languageId: number,
+    description: string
+  ) {
+    const schema = Joi.object({
+      name: Joi.string().required(),
+      barcode: Joi.string().required(),
+      publisherId: Joi.number().required(),
+      price: Joi.number().required(),
+      stock: Joi.number().required(),
+      languageId: Joi.number().required(),
+      description: Joi.string().required(),
+    });
+  
+    const { error } = schema.validate({
+      name,
+      barcode,
+      publisherId,
+      price,
+      stock,
+      languageId,
+      description,
+    });
+  
+    if (error) {
+      throw new Error(`Parâmetros inválidos: ${error.details[0].message}`);
+    }
+  
+    const query = `INSERT INTO public.livros(
+                nome, cod_barra, id_editora, valor_livro, estoque, id_idioma, descricao)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)`;
+  
+    const params = [name, barcode, publisherId, price, stock, languageId, description];
+  
+    await executeQuery(query, params);
+  }
+
+export {insertBook};
