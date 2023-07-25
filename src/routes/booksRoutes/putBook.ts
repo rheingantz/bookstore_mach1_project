@@ -1,6 +1,5 @@
 import { Router, Request, Response } from "express";
-import { putBook } from '../../functions/putBook';
-import { IBookPut } from "../../interfaces/bookInterface";
+import { updateBook } from '../../functions/putBook';
 
 const router = Router();
 
@@ -8,10 +7,24 @@ const bodyParser = require ('body-parser');
 router.use(bodyParser.json());
 
 router.put('/api/updateBook/:id', async (req, res) => {
-    const currentId = Number(req.params.id);
-    const bookBody:IBookPut = req.body;
-    const updatedBook = await putBook(currentId, bookBody);
-    res.json(updatedBook);
+    try {
+        const body = req.body;
+
+        await updateBook(Number(req.params.id),
+          body.name,
+          body.barcode,
+          body.publisherId,
+          body.price,
+          body.stock,
+          body.languageId,
+          body.description
+        );
+    
+        res.status(200).json({ success: "Book successfully saved" });
+      } catch (error:any) {
+        console.error(error);
+        res.status(400).json({ error: error.message });
+      }
 
 });
 

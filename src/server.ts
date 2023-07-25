@@ -1,6 +1,4 @@
 import express from 'express';
-//import { getBooks, getBookById } from './functions/getBooks'
-// import { getAtendentes, getAtendenteById } from './functions/getUsers';
 
 import getBooks from './routes/booksRoutes/getBooks';
 import postBook from './routes/booksRoutes/postBook';

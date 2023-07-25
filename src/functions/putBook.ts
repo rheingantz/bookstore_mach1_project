@@ -1,40 +1,75 @@
 import { executeQuery } from "./queryExecution";
-import { IBookPut } from "../interfaces/bookInterface";
+import Joi from "Joi";
 
-async function putBook(id: number, body: IBookPut) {
+async function updateBook(id: number,
+  name: string,
+  barcode: string,
+  publisherId: number,
+  price: number,
+  stock: number,
+  languageId: number,
+  description: string) {
+    const schema = Joi.object({
+      name: Joi.string(),
+      barcode: Joi.string(),
+      publisherId: Joi.number(),
+      price: Joi.number(),
+      stock: Joi.number(),
+      languageId: Joi.number(),
+      description: Joi.string(),
+    });
+  
+    const { error } = schema.validate({
+      name,
+      barcode,
+      publisherId,
+      price,
+      stock,
+      languageId,
+      description,
+    });
+  
+    if (error) {
+      throw new Error(`Parâmetros inválidos: ${error.details[0].message}`);
+    }
+
   let query = "UPDATE livros SET";
   let changedProps: any = [];
 
-  if (body.nome) {
-    changedProps.push(body.nome);
+  if (name) {
+    changedProps.push(name);
     query += " nome=$" + changedProps.length + ",";
   }
-  if (body.codigo_barras) {
-    changedProps.push(body.codigo_barras);
-    query += " codigo_barras=$" + changedProps.length + ",";
+  if (barcode) {
+    changedProps.push(barcode);
+    query += " cod_barra=$" + changedProps.length + ",";
   }
-  if (body.id_editora) {
-    changedProps.push(body.id_editora);
-    query += " codigo_barras=$" + changedProps.length + ",";
+  if (publisherId) {
+    changedProps.push(publisherId);
+    query += " id_editora=$" + changedProps.length + ",";
   }
-  if (body.preco) {
-    changedProps.push(body.preco);
-    query += " codigo_barras=$" + changedProps.length + ",";
+  if (price) {
+    changedProps.push(price);
+    query += " valor_livro=$" + changedProps.length + ",";
   }
-  if (body.estoque) {
-    changedProps.push(body.estoque);
-    query += " codigo_barras=$" + changedProps.length + ",";
+  if (stock) {
+    changedProps.push(stock);
+    query += " estoque=$" + changedProps.length + ",";
   }
-  if (body.id_idioma) {
-    changedProps.push(body.id_idioma);
-    query += " codigo_barras=$" + changedProps.length + ",";
+  if (languageId) {
+    changedProps.push(languageId);
+    query += " id_idioma=$" + changedProps.length + ",";
+  }
+  if (description) {
+    changedProps.push(description);
+    query += " descricao=$" + changedProps.length + ",";
   }
 
   query = query.slice(0, -1);
-  query += " WHERE id=" + id;
+  query += " WHERE id = " + id;
   console.log(query);
   const updatedBookDB = await executeQuery(query, changedProps);
   return updatedBookDB;
 }
 
-export { putBook };
+export { updateBook };
