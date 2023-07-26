@@ -20,4 +20,4 @@ async function executeQuery(query:string, params:any[]){
     }
   };
 
-export {executeQuery};
+export {pool, executeQuery};
