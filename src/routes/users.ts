@@ -1,10 +1,9 @@
 import { Router, Request, Response } from "express";
 import { getUsers, getUserById } from "../functions/getUsers";
-import { pool } from "../functions/queryExecution";
 
 const route = Router();
 
-route.get("/usersList/", async (req, res) => {
+route.get("/usersList/", async (req: Request, res:Response) => {
   try {
     const users = await getUsers();
 
@@ -19,7 +18,7 @@ route.get("/usersList/", async (req, res) => {
   }
 });
 
-route.get("/user/:id", async (req, res) => {
+route.get("/user/:id", async (req:Request, res:Response) => {
   try {
     const currentId = Number(req.params.id);
     const user = await getUserById(currentId);
