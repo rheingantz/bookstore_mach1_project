@@ -1,11 +1,56 @@
 import { Router, Request, Response } from "express";
-import { getSales } from "../functions/getSales";
+import { getSaleById, getSales, getSalesByDate } from "../functions/getSales";
 
-const route = Router()
+const route = Router();
 
-route.get('/salesList', async (req, res) => {
+route.get("/salesList", async (req, res) => {
+  try {
     const sales = await getSales();
+
+    if (sales.length === 0) {
+      return res.status(404).json({ error: "There are no registered sales" });
+    }
+
     res.status(200).json(sales);
+  } catch (err) {
+    console.error("Error fetching sales", err);
+    return res.status(500).json({ error: "Error fetching sales" });
+  }
 });
 
-export default route
+route.get("/sale/:id", async (req: Request, res: Response) => {
+  try {
+    const saleId = Number(req.params.id);
+    const sale = await getSaleById(saleId);
+
+    if (sale.length === 0) {
+      return res.status(404).json({ error: "Sale not found" });
+    }
+
+    return res.status(200).json(sale);
+  } catch (err) {
+    console.error("Error fetching sale", err);
+    return res.status(500).json({ error: "Error fetching sale" });
+  }
+});
+
+route.get("/salesByDate", async (req: Request, res: Response) => {
+  try {
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+    const sale = await getSalesByDate(startDate, endDate);
+
+    if (sale.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "There are no sales in this date range" });
+    }
+
+    return res.status(200).json(sale);
+  } catch (err) {
+    console.error("Error fetching sales by date", err);
+    return res.status(500).json({ error: "Error fetching sales by date" });
+  }
+});
+
+export default route;
