@@ -3,10 +3,12 @@ import { getBooks, getBookById } from "../functions/getBooks";
 import { insertBook } from "../functions/postBook";
 import { updateBook } from "../functions/putBook";
 
+import { authMiddleware} from '../midwareAuthorization'
+
 const route = Router();
 const bodyParser = require("body-parser");
 
-route.get("/booksList", async (req: Request, res: Response) => {
+route.get("/booksList", authMiddleware, async (req: Request, res: Response) => {
   try {
     const books = await getBooks();
 
@@ -36,48 +38,5 @@ route.get("/book/:id", async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Error fetching book" });
   }
 });
-
-// route.post("/newBook", async (req, res) => {
-//   try {
-//     const body = req.body;
-
-//     await insertBook(
-//       body.name,
-//       body.barcode,
-//       body.publisherId,
-//       body.price,
-//       body.stock,
-//       body.languageId,
-//       body.description
-//     );
-
-//     res.status(200).json({ success: "Book successfully saved" });
-//   } catch (error: any) {
-//     console.error(error);
-//     res.status(400).json({ error: error.message });
-//   }
-// });
-
-// route.put('/updateBook/:id', async (req, res) => {
-//     try {
-//         const body = req.body;
-
-//         await updateBook(Number(req.params.id),
-//           body.name,
-//           body.barcode,
-//           body.publisherId,
-//           body.price,
-//           body.stock,
-//           body.languageId,
-//           body.description
-//         );
-
-//         res.status(200).json({ success: "Book successfully saved" });
-//       } catch (error:any) {
-//         console.error(error);
-//         res.status(400).json({ error: error.message });
-//       }
-
-// });
 
 export { route, bodyParser };
