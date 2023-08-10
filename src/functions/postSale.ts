@@ -1,4 +1,4 @@
-import { executeQuery } from "./queryExecution";
+import { executeIdGet } from "./queryIdGet";
 import Joi from "Joi";
 
 async function insertSale(
@@ -42,21 +42,18 @@ async function insertSale(
 
   const saleParams = [id_customer, totalCost];
 
-  await executeQuery(saleQuery, saleParams);
+  const currentSaleId = await executeIdGet(saleQuery, saleParams);
 
-  // for (const saleItem of sale_items) {
-  //   const itemsQuery =
-  //     "INSERT INTO public.venda(id_venda, id_livro, quantidade, valor_unitario) VALUES ($1, $2, $3, $4)";
+  for (const saleItem of sale_items) {
 
-  //   let itemsParams = [
-  //     id_sale,
-  //     id_livro,
-  //     sale_items.quantity,
-  //     sale_items.unit_price,
-  //   ];
+    let itemQuery =
+      "INSERT INTO public.itens_venda(id_venda, id_livro, quantidade, valor_unitario) VALUES ($1, $2, $3, $4)";
 
-  //   await executeQuery(itemsQuery, itemsParams);
-  // }
+    let itemParams = [currentSaleId, saleItem.id_book, saleItem.quantity, saleItem.unit_price]
+
+    await executeIdGet(itemQuery, itemParams)
+
+  }
 
 }
 
