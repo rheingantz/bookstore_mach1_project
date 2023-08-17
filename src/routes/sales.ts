@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { getSaleById, getSales, getSalesByDate } from "../functions/getSales";
+import { insertSale } from "../functions/postSale";
 
 const route = Router();
 
@@ -50,6 +51,18 @@ route.get("/salesByDate", async (req: Request, res: Response) => {
   } catch (err) {
     console.error("Error fetching sales by date", err);
     return res.status(500).json({ error: "Error fetching sales by date" });
+  }
+});
+
+route.post("/api/salePost", async (req: Request, res: Response) => {
+  try {
+    const saleBody = req.body;
+    await insertSale(saleBody.id_customer, saleBody.sale_items);
+    res.status(200).json({ message: ' Venda bem sucedida!' });
+
+  } catch (err) {
+    console.error("Error fetching post sales", err);
+    return res.status(500).json({ error: "Error fetching post sales" });
   }
 });
 

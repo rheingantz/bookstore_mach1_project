@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { route, bodyParser } from "./routes/books";
-import salesRoute from "./routes/sales";
+import salesRoute from "./routes/sales"
 import usersRoute from "./routes/users";
 import signInRoute from "./routes/signIn";
 import loginRoute from "./routes/login";
