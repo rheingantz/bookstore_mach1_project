@@ -1,7 +1,7 @@
-import { executeIdGet } from "./queryIdGet";
+import { executeIdGet } from "../queryIdGet";
 import Joi from "Joi";
 
-async function insertSale(
+async function insertSaleModel(
   id_customer: number,
   sale_items: Array<{
     id_book: number;
@@ -57,4 +57,4 @@ async function insertSale(
 
 }
 
-export { insertSale };
+export { insertSaleModel };

@@ -1,16 +1,11 @@
 import { Router, Request, Response } from "express";
-import { getBooks, getBookById } from "../functions/getBooks";
-import { insertBook } from "../functions/postBook";
-import { updateBook } from "../functions/putBook";
+import { getBooksModel, getBookByIdModel } from "../../functions/bookFunctions/getBooksModels";
 
-import { authMiddleware} from '../midwareAuthorization'
+class getBooksController{
 
-const route = Router();
-const bodyParser = require("body-parser");
-
-route.get("/booksList", authMiddleware, async (req: Request, res: Response) => {
+async getBooks (req: Request, res: Response) {
   try {
-    const books = await getBooks();
+    const books = await getBooksModel();
 
     if (books.length === 0) {
       return res.status(404).json({ error: "There are no registered books" });
@@ -21,12 +16,12 @@ route.get("/booksList", authMiddleware, async (req: Request, res: Response) => {
     console.error("Error fetching books", err);
     return res.status(505).json({ error: "Error fetching books" });
   }
-});
+};
 
-route.get("/book/:id", async (req: Request, res: Response) => {
+async getBookById (req: Request, res: Response) {
   try {
     const currentId = Number(req.params.id);
-    const book = await getBookById(currentId);
+    const book = await getBookByIdModel(currentId);
 
     if (book.length === 0) {
       return res.status(404).json({ error: "Book not found" });
@@ -37,6 +32,8 @@ route.get("/book/:id", async (req: Request, res: Response) => {
     console.error("Error fetching book", err);
     return res.status(500).json({ error: "Error fetching book" });
   }
-});
+}
 
-export { route, bodyParser };
+}
+
+export default new getBooksController();

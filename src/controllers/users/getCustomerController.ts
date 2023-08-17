@@ -1,9 +1,9 @@
 import { Router, Request, Response } from "express";
-import { getUsers, getUserById } from "../functions/getUsers";
+import { getUsers, getUserById } from "../../functions/customerFunctions/getUsersModels";
 
-const route = Router();
+class getCustomerController{
 
-route.get("/usersList/", async (req: Request, res:Response) => {
+async getUsers(req: Request, res:Response) {
   try {
     const users = await getUsers();
 
@@ -16,9 +16,9 @@ route.get("/usersList/", async (req: Request, res:Response) => {
     console.error("Error fetching users", err);
     return res.status(500).json({ error: "Error fetching users" });
   }
-});
+};
 
-route.get("/user/:id", async (req:Request, res:Response) => {
+async getUserById(req:Request, res:Response) {
   try {
     const currentId = Number(req.params.id);
     const user = await getUserById(currentId);
@@ -32,6 +32,8 @@ route.get("/user/:id", async (req:Request, res:Response) => {
     console.error("Error fetching user", err);
     return res.status(500).json({ error: "Error fetching user" });
   }
-});
+};
 
-export default route;
+};
+
+export default new getCustomerController;

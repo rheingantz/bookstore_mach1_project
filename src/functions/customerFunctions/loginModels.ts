@@ -1,6 +1,5 @@
-export { executeQuery } from '../functions/queryExecution';
 import argon2 from 'argon2';
-import { executeQuery } from './queryExecution';
+import { executeQuery } from '../queryExecution';
 
 async function logIn(body:any){
 

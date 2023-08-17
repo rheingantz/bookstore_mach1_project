@@ -1,14 +1,14 @@
-import { executeQuery } from "./queryExecution";
+import { executeQuery } from "../queryExecution";
 
 async function getUsers(){
-    const query = 'select id, nome, sobrenome from atendentes'
+    const query = 'select id, nome, sobrenome from clientes'
     const usersDB = await executeQuery(query, []);
     console.log(usersDB);
     return usersDB;
 }
 
 async function getUserById(id:number){
-    const query = 'select id, nome, sobrenome from atendentes where id=$1';
+    const query = 'select id, nome, sobrenome from clientes where id=$1';
     const params = [id];
     const userBD = await executeQuery(query, params);
     console.log(userBD);
