@@ -1,5 +1,5 @@
 import express, { Router, Request, Response } from 'express';
-import { logIn } from '../functions/login';
+import { logIn } from '../../functions/customerFunctions/loginModels';
 import dotenv from 'dotenv';
 const jwt = require('jsonwebtoken');
 
@@ -9,7 +9,9 @@ const router = Router();
 
 router.use(express.json());
 
-router.post('/api/login', async (req: Request, res: Response) => {
+class logInController{
+
+async logIn(req: Request, res: Response) {
   const login = req.body;
 
   try {
@@ -27,11 +29,13 @@ router.post('/api/login', async (req: Request, res: Response) => {
     
     const token = jwt.sign(payload, process.env.JWT_SECRET);
 
-    res.status(200).json({ message: 'Login successful! your token: ' + token });
+    res.status(200).json({ logIn: true, token: token });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
-});
+};
 
-export default router;
+};
+
+export default new logInController;

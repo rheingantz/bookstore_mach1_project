@@ -1,4 +1,4 @@
-import { executeQuery } from "./queryExecution";
+import { executeQuery } from "../queryExecution";
 import Joi from "Joi";
 
 
