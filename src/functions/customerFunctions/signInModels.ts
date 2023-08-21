@@ -3,7 +3,7 @@ import Joi from "Joi";
 
 const argon2 = require("argon2");
 
-async function postCustomer(
+async function signInModel(
   name: string,
   surname: string,
   cpf: string,
@@ -59,4 +59,4 @@ async function postCustomer(
   return newCustomerDB;
 }
 
-export { postCustomer };
+export { signInModel };
