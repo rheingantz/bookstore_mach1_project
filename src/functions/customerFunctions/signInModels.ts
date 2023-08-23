@@ -1,5 +1,10 @@
 import { executeQuery } from "../queryExecution";
 import Joi from "Joi";
+import {
+  beginTransaction,
+  commitTransaction,
+  rollbackTransaction,
+} from "../transactionControll";
 
 const argon2 = require("argon2");
 
@@ -30,33 +35,43 @@ async function signInModel(
     throw new Error(`Parâmetros inválidos: ${error.details[0].message}`);
   }
 
-  const existingEmail = await executeQuery(
-    "SELECT * FROM clientes WHERE email = $1",
-    [email]
-  );
-  if (existingEmail.length > 0) {
-    throw new Error("Email already signed in");
-  }
+  try {
+    await beginTransaction;
 
-  const existingCpf = await executeQuery(
-    "SELECT * FROM clientes WHERE cpf = $1",
-    [cpf]
-  );
-  if (existingCpf.length > 0) {
-    throw new Error("CPF already signed in");
-  }
+    const existingEmail = await executeQuery(
+      "SELECT * FROM clientes WHERE email = $1",
+      [email]
+    );
+    if (existingEmail.length > 0) {
+      throw new Error("Email already signed in");
+    }
 
-  const hashedPassword = await argon2.hash(password);
-  const query =
-    "INSERT INTO public.clientes(nome, sobrenome, cpf, email, senha) VALUES ($1, $2, $3, $4, $5);";
-  const newCustomerDB = await executeQuery(query, [
-    name,
-    surname,
-    cpf,
-    email,
-    hashedPassword,
-  ]);
-  return newCustomerDB;
+    const existingCpf = await executeQuery(
+      "SELECT * FROM clientes WHERE cpf = $1",
+      [cpf]
+    );
+    if (existingCpf.length > 0) {
+      throw new Error("CPF already signed in");
+    }
+
+    const hashedPassword = await argon2.hash(password);
+    const query =
+      "INSERT INTO public.clientes(nome, sobrenome, cpf, email, senha) VALUES ($1, $2, $3, $4, $5);";
+    const newCustomerDB = await executeQuery(query, [
+      name,
+      surname,
+      cpf,
+      email,
+      hashedPassword,
+    ]);
+
+    await commitTransaction;
+
+    return newCustomerDB;
+  } catch (error) {
+    console.error("Error signing in", error);
+    await rollbackTransaction;
+  }
 }
 
 export { signInModel };

@@ -1,75 +1,92 @@
 import { executeQuery } from "../queryExecution";
 import Joi from "Joi";
+import {
+  beginTransaction,
+  commitTransaction,
+  rollbackTransaction,
+} from "../transactionControll";
 
-async function updateBook(id: number,
+async function updateBook(
+  id: number,
   name: string,
   barcode: string,
   publisherId: number,
   price: number,
   stock: number,
   languageId: number,
-  description: string) {
-    const schema = Joi.object({
-      name: Joi.string(),
-      barcode: Joi.string(),
-      publisherId: Joi.number(),
-      price: Joi.number(),
-      stock: Joi.number(),
-      languageId: Joi.number(),
-      description: Joi.string(),
-    });
-  
-    const { error } = schema.validate({
-      name,
-      barcode,
-      publisherId,
-      price,
-      stock,
-      languageId,
-      description,
-    });
-  
-    if (error) {
-      throw new Error(`Parâmetros inválidos: ${error.details[0].message}`);
+  description: string
+) {
+  const schema = Joi.object({
+    name: Joi.string(),
+    barcode: Joi.string(),
+    publisherId: Joi.number(),
+    price: Joi.number(),
+    stock: Joi.number(),
+    languageId: Joi.number(),
+    description: Joi.string(),
+  });
+
+  const { error } = schema.validate({
+    name,
+    barcode,
+    publisherId,
+    price,
+    stock,
+    languageId,
+    description,
+  });
+
+  if (error) {
+    throw new Error(`Parâmetros inválidos: ${error.details[0].message}`);
+  }
+
+  try {
+    await beginTransaction;
+
+    let query = "UPDATE livros SET";
+    let changedProps: any = [];
+
+    if (name) {
+      changedProps.push(name);
+      query += " nome=$" + changedProps.length + ",";
+    }
+    if (barcode) {
+      changedProps.push(barcode);
+      query += " cod_barra=$" + changedProps.length + ",";
+    }
+    if (publisherId) {
+      changedProps.push(publisherId);
+      query += " id_editora=$" + changedProps.length + ",";
+    }
+    if (price) {
+      changedProps.push(price);
+      query += " valor_livro=$" + changedProps.length + ",";
+    }
+    if (stock) {
+      changedProps.push(stock);
+      query += " estoque=$" + changedProps.length + ",";
+    }
+    if (languageId) {
+      changedProps.push(languageId);
+      query += " id_idioma=$" + changedProps.length + ",";
+    }
+    if (description) {
+      changedProps.push(description);
+      query += " descricao=$" + changedProps.length + ",";
     }
 
-  let query = "UPDATE livros SET";
-  let changedProps: any = [];
+    query = query.slice(0, -1);
+    query += " WHERE id = " + id;
+    console.log(query);
+    const updatedBookDB = await executeQuery(query, changedProps);
 
-  if (name) {
-    changedProps.push(name);
-    query += " nome=$" + changedProps.length + ",";
-  }
-  if (barcode) {
-    changedProps.push(barcode);
-    query += " cod_barra=$" + changedProps.length + ",";
-  }
-  if (publisherId) {
-    changedProps.push(publisherId);
-    query += " id_editora=$" + changedProps.length + ",";
-  }
-  if (price) {
-    changedProps.push(price);
-    query += " valor_livro=$" + changedProps.length + ",";
-  }
-  if (stock) {
-    changedProps.push(stock);
-    query += " estoque=$" + changedProps.length + ",";
-  }
-  if (languageId) {
-    changedProps.push(languageId);
-    query += " id_idioma=$" + changedProps.length + ",";
-  }
-  if (description) {
-    changedProps.push(description);
-    query += " descricao=$" + changedProps.length + ",";
-  }
+    await commitTransaction;
 
-  query = query.slice(0, -1);
-  query += " WHERE id = " + id;
-  console.log(query);
-  const updatedBookDB = await executeQuery(query, changedProps);
-  return updatedBookDB;
+    return updatedBookDB;
+  } catch (error) {
+    console.error("Error fetching put book", error);
+    await rollbackTransaction;
+  }
 }
 
 export { updateBook };

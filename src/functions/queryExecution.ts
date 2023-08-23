@@ -20,4 +20,14 @@ async function executeQuery(query:string, params:any[]){
     }
   };
 
-export {pool, executeQuery};
+  async function executeIdGet(query:string, params:any[]){
+    const client = await pool.connect();
+    try{
+      const result = await client.query(query+` RETURNING id`, params)
+      return result.rows[0].id;
+    } finally {
+      client.release()
+    }
+  };
+
+export {pool, executeQuery, executeIdGet};
