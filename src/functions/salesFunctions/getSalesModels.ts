@@ -1,4 +1,5 @@
 import { executeQuery } from "../queryExecution";
+import { beginTransaction, commitTransaction, rollbackTransaction } from "../transactionControll";
 
 async function getSalesModel() {
     const query = "select * from venda";
@@ -7,10 +8,17 @@ async function getSalesModel() {
 }
 
 async function getSaleByIdModel(id:number){
+    try{
+        await beginTransaction
     const query = 'select id, total_venda, data_venda from venda where id=$1';
     const params = [id];
     const userBD = await executeQuery(query, params);
-    return userBD;
+    await commitTransaction;
+    return userBD;   
+    } catch (error) {
+        console.error("Error fetching post sales", error);
+        await rollbackTransaction;
+      }
 }
 
 async function getSalesByDateModel(startDate:any, endDate:any) {

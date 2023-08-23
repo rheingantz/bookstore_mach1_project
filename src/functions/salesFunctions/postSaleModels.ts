@@ -1,4 +1,9 @@
-import { executeIdGet } from "../queryIdGet";
+import { executeIdGet } from "../queryExecution";
+import {
+  beginTransaction,
+  commitTransaction,
+  rollbackTransaction,
+} from "../transactionControll";
 import Joi from "Joi";
 
 async function insertSaleModel(
@@ -37,24 +42,35 @@ async function insertSaleModel(
     totalCost += saleItem.quantity * saleItem.unit_price;
   }
 
-  const saleQuery = `INSERT INTO public.venda(id_cliente, total_venda, data_venda)
+  try {
+    await beginTransaction;
+
+    const saleQuery = `INSERT INTO public.venda(id_cliente, total_venda, data_venda)
     VALUES ($1, $2, NOW())`;
 
-  const saleParams = [id_customer, totalCost];
+    const saleParams = [id_customer, totalCost];
 
-  const currentSaleId = await executeIdGet(saleQuery, saleParams);
+    const currentSaleId = await executeIdGet(saleQuery, saleParams);
 
-  for (const saleItem of sale_items) {
+    for (const saleItem of sale_items) {
+      let itemQuery =
+        "INSERT INTO public.itens_venda(id_venda, id_livro, quantidade, valor_unitario) VALUES ($1, $2, $3, $4)";
 
-    let itemQuery =
-      "INSERT INTO public.itens_venda(id_venda, id_livro, quantidade, valor_unitario) VALUES ($1, $2, $3, $4)";
+      let itemParams = [
+        currentSaleId,
+        saleItem.id_book,
+        saleItem.quantity,
+        saleItem.unit_price,
+      ];
 
-    let itemParams = [currentSaleId, saleItem.id_book, saleItem.quantity, saleItem.unit_price]
+      await executeIdGet(itemQuery, itemParams);
+    }
 
-    await executeIdGet(itemQuery, itemParams)
-
+    await commitTransaction;
+  } catch (error) {
+    console.error("Error fetching post sales", error);
+    await rollbackTransaction;
   }
-
 }
 
 export { insertSaleModel };
