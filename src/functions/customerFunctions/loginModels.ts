@@ -8,14 +8,14 @@ import {
 
 async function logIn(body: any) {
   try {
-    await beginTransaction;
+    beginTransaction;
 
     const query = "SELECT * FROM clientes WHERE email = $1";
 
     const result = await executeQuery(query, [body.email]);
 
-    if (result === null) {
-      return false;
+    if (result.length === 0) {
+      throw new Error("Invalid Email or Password");
     }
 
     const password_hash = result;
@@ -25,12 +25,17 @@ async function logIn(body: any) {
       body.password
     );
 
-    await commitTransaction;
+    if (isPasswordValid === false) {
+      throw new Error("Invalid Email or Password");
+    }
+
+    commitTransaction;
 
     return isPasswordValid;
   } catch (error) {
     console.error("Error loging in", error);
-    await rollbackTransaction;
+    rollbackTransaction;
+    throw error;
   }
 }
 

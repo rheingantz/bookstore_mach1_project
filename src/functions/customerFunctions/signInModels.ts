@@ -36,12 +36,13 @@ async function signInModel(
   }
 
   try {
-    await beginTransaction;
+    beginTransaction;
 
     const existingEmail = await executeQuery(
       "SELECT * FROM clientes WHERE email = $1",
       [email]
     );
+
     if (existingEmail.length > 0) {
       throw new Error("Email already signed in");
     }
@@ -65,12 +66,13 @@ async function signInModel(
       hashedPassword,
     ]);
 
-    await commitTransaction;
+    commitTransaction;
 
     return newCustomerDB;
   } catch (error) {
     console.error("Error signing in", error);
-    await rollbackTransaction;
+    rollbackTransaction;
+    throw error;
   }
 }
 

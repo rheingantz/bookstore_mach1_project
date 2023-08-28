@@ -3,3 +3,4 @@ DB_USER = userDataBase
 DB_PASSWORD = passwordDataBase
 DB_DATABASE = db
 DB_PORT = port
+JWT_SECRET = yourSecretKey

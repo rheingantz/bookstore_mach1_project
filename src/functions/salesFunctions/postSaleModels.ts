@@ -43,7 +43,7 @@ async function insertSaleModel(
   }
 
   try {
-    await beginTransaction;
+    beginTransaction;
 
     const saleQuery = `INSERT INTO public.venda(id_cliente, total_venda, data_venda)
     VALUES ($1, $2, NOW())`;
@@ -66,10 +66,11 @@ async function insertSaleModel(
       await executeIdGet(itemQuery, itemParams);
     }
 
-    await commitTransaction;
+    commitTransaction;
   } catch (error) {
     console.error("Error fetching post sales", error);
-    await rollbackTransaction;
+    rollbackTransaction;
+    throw error;
   }
 }
 
