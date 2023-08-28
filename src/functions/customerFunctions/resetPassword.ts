@@ -24,7 +24,7 @@ async function resetPasswordModel(email: string, password: string) {
   }
 
   try {
-    await beginTransaction;
+    beginTransaction;
 
     const existingEmail = await executeQuery(
       "SELECT * FROM clientes WHERE email = $1",
@@ -32,19 +32,20 @@ async function resetPasswordModel(email: string, password: string) {
     );
 
     if (existingEmail.length === 0) {
-      throw new Error("Email not registered");
+      throw new Error("Email invalid");
     }
 
     const hashedPassword = await argon2.hash(password);
     const query = "UPDATE clientes SET senha = $1 WHERE email = $2";
     const newCustomerDB = await executeQuery(query, [hashedPassword, email]);
 
-    await commitTransaction;
+    commitTransaction;
 
     return newCustomerDB;
   } catch (error) {
     console.error("Error creating new password", error);
-    await rollbackTransaction;
+    rollbackTransaction;
+    throw error;
   }
 }
 

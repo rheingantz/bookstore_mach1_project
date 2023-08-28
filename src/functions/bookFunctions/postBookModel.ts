@@ -60,7 +60,7 @@ async function insertBook(
 
     await commitTransaction;
   } catch (error) {
-    console.error("Error fetching post books", error);
+    console.error("Error fetching post book", error);
     await rollbackTransaction;
   }
 }

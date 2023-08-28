@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from "express";
 
-const jwt = require ('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
-const dotenv = require ('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
 
 interface TokenPayload {
@@ -17,28 +17,32 @@ export default function authMiddleware(
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).json({ message: 'No token provided' });
+    return res.status(401).json({ message: "No token provided" });
   }
 
-  const parts = authHeader.split(' ');
+  const parts = authHeader.split(" ");
 
   if (parts.length !== 2) {
-    return res.status(401).json({ message: 'Token error' });
+    return res.status(401).json({ message: "Token error" });
   }
 
   const [scheme, token] = parts;
-  
+
   if (!/^Bearer$/i.test(scheme)) {
-    return res.status(401).json({ message: 'Token malformatted' });
+    return res.status(401).json({ message: "Token malformatted" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err: any, decoded: TokenPayload) => {
-    if (err) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
+  jwt.verify(
+    token,
+    process.env.JWT_SECRET,
+    (err: any, decoded: TokenPayload) => {
+      if (err) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
 
-    return next();
-  });
+      return next();
+    }
+  );
 }
 
-export {authMiddleware};
+export { authMiddleware };
